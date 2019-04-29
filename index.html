@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="src/js/p5.min.js"></script>
+  <script src="src/js/p5.dom.min.js"></script>
+  <script src="src/js/p5.sound.min.js"></script>
+  <meta charset="utf-8">
+  <title>Morse Traductor</title>
+  <audio id="sound" controls style="display:none">
+    <source src="media/bipSound3.wav" type="audio/mpeg"> Your browser does not support the audio element.
+  </audio>
+  <audio id="test" controls style="display:none">
+    <source src="media/vine-alphabet-original.mp3" type="audio/mpeg"> Your browser does not support the audio element.
+  </audio>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <!-- Un peu de style pour la visualisation -->
+  <style type="text/css">
+    .col-lg-2 {
+      line-height: 100px;
+    }
+
+    .col-lg-5 {
+      line-height: 200px;
+    }
+
+    .col-lg-12 {
+      line-height: 2em;
+      padding: 1em 1em;
+    }
+  </style>
+  <link rel="stylesheet" type="text/css" href="src/css/style.css">
+
+</head>
+
+<body>
+
+
+  <header>
+    <div class="col-lg-12">
+      <p class="text-center display-3">Morse Traductor</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="row justify-content-md-center">
+      <div id="slider_container" class="col-lg-12">
+        <div class="text-center">
+          <input type="range" min="100" max="1000" value="200" class="slider" id="myRange">
+        </div>
+        <div class="text-center">
+          Current Frequency : <span id="titime"></span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <section class=" col-lg-6">
+        <div class="input-group mb-3">
+          <input id="input_text" type="text" class="form-control" placeholder="Insert text ( ex : bonjour )"
+            aria-label="Insert text" aria-describedby="button-addon2">
+          <div class="input-group-append">
+            <button class="btn btn-outline-primary" type="button" id="listen_button" data-container="body"
+              data-toggle="popover" title="Listening" data-placement="bottom">Listen</span></button>
+            <button class="btn btn-outline-primary" type="button" data-toggle="collapse" data-target="#help_listen"
+              aria-expanded="false" aria-controls="help_listen">Help</span></button>
+          </div>
+        </div>
+        <div class="collapse" id="help_listen">
+          <div class="card card-body bg-light mb-3">
+            Type any text and click on <b>Listen</b> to listen to your text in morse code.
+          </div>
+        </div>
+      </section>
+      <section class=" col-lg-6">
+        <div class="input-group mb-3">
+          <input id="input_morse" type="text" class="form-control"
+            placeholder="Insert Morse ( ex : ./_.._/./__/.__./._../. )" aria-label="Insert Morse"
+            aria-describedby="button-addon2">
+          <div class="input-group-append">
+            <button class="btn btn-outline-primary" type="button" id="translate_button" data-container="body"
+              data-toggle="popover" title="Traduction" data-placement="bottom">Translate</span></button>
+            <button class="btn btn-outline-primary" type="button" data-toggle="collapse" data-target="#help_translate"
+              aria-expanded="false" aria-controls="help_translate">Help</span></button>
+          </div>
+
+        </div>
+        <div class="collapse" id="help_translate">
+          <div class="card card-body bg-light mb-3">
+            Type any morse code and click on <b>Translate</b> to see the corresponding text.<br>
+            A morse code table is available below.<br>
+            Separate each letter by a '/' and each word by a '//'.<br>
+            <i>ex : hello world &rarr; ...././._../._../___//.__/___/._./._../_..</i>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-3 "> </div>
+
+      <div class="col-lg-6 col-md-6 col-sm-6 col-6">
+        <div class="alert alert-info" role="alert" id="output_bip">
+        </div>
+        <div class="collapse" id="help_bip">
+          <div class="card card-body bg-light mb-3">
+            <b>Code your own morse message.</b><br>
+            Hold SHIFT and code your morse message using the space bar.
+            You can change the frequency of the message using the slider at the top.
+            <i>1 Hz &rarr; a unit last 1 second</i>
+            You can delete a character by pressing DEL or clear the message box by pressing CTRL+DEL.
+          </div>
+        </div>
+
+      </div>
+      <div class="col-lg-1 col-md-1 col-sm-1 col-1">
+        <button class="btn btn-outline-primary help_bip " type="button" data-toggle="collapse" data-target="#help_bip"
+          aria-expanded="false" aria-controls="help_bip">Help</span></button>
+      </div>
+    </div>
+
+    <footer class="row">
+      <div id="foot_container" class="col-lg-12">
+        <div class="text-center">
+          <img src="media/morse_code.png" class="img-fluid" alt="Morse Code Table">
+        </div>
+
+      </div>
+    </footer>
+
+    <div class="row">
+        &copy; Tangi Mendes 2019&nbsp;-&nbsp;<a target="_blank" rel="noopener noreferrer" href="https://github.com/tangimds/morse-traductor">source code</a>
+    </div>
+  </div>
+  <script src="src/js/buffer.js"></script>
+  <script src="src/js/sketch.js"></script>
+
+</body>
+</html>
